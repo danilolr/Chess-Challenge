@@ -19,7 +19,8 @@ namespace ChessChallenge.Application
         {
             Human,
             MyBot,
-            EvilBot
+            EvilBot,
+            RandomBot
         }
 
         // Game state
@@ -205,12 +206,15 @@ namespace ChessChallenge.Application
 
         ChessPlayer CreatePlayer(PlayerType type)
         {
-            return type switch
+            if (type == PlayerType.Human)
             {
-                PlayerType.MyBot => new ChessPlayer(new MyBot(), type, GameDurationMilliseconds),
-                PlayerType.EvilBot => new ChessPlayer(new EvilBot(), type, GameDurationMilliseconds),
-                _ => new ChessPlayer(new HumanPlayer(boardUI), type)
-            };
+                return new ChessPlayer(new HumanPlayer(boardUI), type);
+            }
+            else
+            {
+                Type classType = PlayerTypes.playerTypes[type];
+                return new ChessPlayer(Activator.CreateInstance(classType), type, GameDurationMilliseconds);
+            }
         }
 
         static int GetTokenCount()

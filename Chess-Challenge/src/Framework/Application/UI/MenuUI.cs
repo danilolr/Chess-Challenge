@@ -7,6 +7,8 @@ namespace ChessChallenge.Application
 {
     public static class MenuUI
     {
+        private static ChallengeController.PlayerType playerWhite = ChallengeController.PlayerType.Human; 
+        private static ChallengeController.PlayerType playerBlack = ChallengeController.PlayerType.MyBot; 
         public static void DrawButtons(ChallengeController controller)
         {
             Vector2 buttonPos = UIHelper.Scale(new Vector2(260, 210));
@@ -15,20 +17,24 @@ namespace ChessChallenge.Application
             float breakSpacing = spacing * 0.6f;
 
             // Game Buttons
-            if (NextButtonInRow("Human vs MyBot", ref buttonPos, spacing, buttonSize))
+            if (NextButtonInRow("New Game", ref buttonPos, spacing, buttonSize))
             {
-                var whiteType = controller.HumanWasWhiteLastGame ? ChallengeController.PlayerType.MyBot : ChallengeController.PlayerType.Human;
-                var blackType = !controller.HumanWasWhiteLastGame ? ChallengeController.PlayerType.MyBot : ChallengeController.PlayerType.Human;
-                controller.StartNewGame(whiteType, blackType);
+                if (playerWhite != ChallengeController.PlayerType.Human &&
+                    playerBlack != ChallengeController.PlayerType.Human)
+                {
+                    controller.StartNewBotMatch(playerWhite, playerBlack);    
+                }
+                else
+                {
+                    controller.StartNewGame(playerWhite, playerBlack);    
+                }
             }
-            if (NextButtonInRow("MyBot vs MyBot", ref buttonPos, spacing, buttonSize))
-            {
-                controller.StartNewBotMatch(ChallengeController.PlayerType.MyBot, ChallengeController.PlayerType.MyBot);
-            }
-            if (NextButtonInRow("MyBot vs EvilBot", ref buttonPos, spacing, buttonSize))
-            {
-                controller.StartNewBotMatch(ChallengeController.PlayerType.MyBot, ChallengeController.PlayerType.EvilBot);
-            }
+
+            // Player select buttons
+            buttonPos.Y += breakSpacing;
+
+            NextSelectInRow(ref buttonPos, spacing, buttonSize, ref playerWhite, true);
+            NextSelectInRow(ref buttonPos, spacing, buttonSize, ref playerBlack, false);
 
             // Page buttons
             buttonPos.Y += breakSpacing;
@@ -76,6 +82,14 @@ namespace ChessChallenge.Application
                 pos.Y += spacingY;
                 return pressed;
             }
+            
+            bool NextSelectInRow(ref Vector2 pos, float spacingY, Vector2 size, ref ChallengeController.PlayerType player, bool isWhite)
+            {
+                bool pressed = UIHelper.Select(pos, size, ref player, isWhite);
+                pos.Y += spacingY;
+                return pressed;
+            }
+
         }
     }
 }

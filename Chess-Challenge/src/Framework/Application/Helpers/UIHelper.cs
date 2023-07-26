@@ -97,6 +97,34 @@ namespace ChessChallenge.Application
 
             return pressedThisFrame;
         }
+        
+        public static bool Select(Vector2 centre, Vector2 size, ref ChallengeController.PlayerType player, bool isWhite)
+        {
+            Rectangle rec = new(centre.X - size.X / 2, centre.Y - size.Y / 2, size.X, size.Y);
+
+            Color pressCol = new(2, 119, 173, 255);
+            Color hoverCol = new(3, 173, 252, 255);
+
+            bool mouseOver = MouseInRect(rec);
+            bool pressed = mouseOver && Raylib.IsMouseButtonDown(MouseButton.MOUSE_BUTTON_LEFT);
+            bool pressedThisFrame = pressed && Raylib.IsMouseButtonPressed(MouseButton.MOUSE_BUTTON_LEFT);
+            Color col = mouseOver ? (pressed ? pressCol : hoverCol) : isWhite ? Color.WHITE  : Color.BLACK;
+
+            Raylib.DrawRectangleRec(rec, col);
+            Color textCol = isWhite ? Color.BLACK : Color.WHITE;
+            int fontSize = ScaleInt(32);
+
+            string text = PlayerTypes.GetDescription(player);
+
+            DrawText(text, centre, fontSize, 1, textCol, AlignH.Centre);
+
+            if (pressedThisFrame)
+            {
+                player = PlayerTypes.GetNextType(player);
+            }
+
+            return pressedThisFrame;
+        }
 
         static bool MouseInRect(Rectangle rec)
         {
